@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Items - Moshi Rental{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* General Styles for a Modern Look */
+    body, h1, h2, h3, h4, h5, h6, p, a, .btn {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    /* Modern Card Styles for Item List */
+    .item-card {
+        background: #fff;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 30px rgba(60, 80, 180, 0.08); /* Softer shadow */
+        border: none;
+        overflow: hidden;
+        transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+        height: 100%; /* Ensures all cards in a row are same height */
+        display: flex;
+        flex-direction: column; /* Stack content vertically */
+    }
+    .item-card:hover {
+        transform: translateY(-8px) scale(1.02); /* Lift and slightly enlarge on hover */
+        box-shadow: 0 18px 55px rgba(60, 80, 180, 0.15); /* Stronger shadow on hover */
+    }
+
+    .item-card-img {
+        width: 100%;
+        height: 200px; /* Fixed height for consistent image size */
+        object-fit: cover;
+        border-radius: 1.5rem 1.5rem 0 0; /* Rounded top corners */
+        position: relative;
+    }
+
+    .item-card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Allows body to grow and fill space */
+    }
+    .item-card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+    .item-card-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        flex-grow: 1; /* Allows description to take available height */
+    }
+
+    .item-card-price {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #3c50b4;
+        background: #e3f0ff;
+        padding: 0.4rem 1rem;
+        border-radius: 1rem;
+        display: inline-flex; /* Use inline-flex for icon alignment */
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 1px 6px rgba(60,80,180,0.08);
+        margin-right: 0.75rem; /* Space between price and stars */
+    }
+    .item-card-price i {
+        color: #28a745; /* Green icon for price */
+        font-size: 1.1rem;
+    }
+
+    .item-card-rating {
+        color: #ffc107; /* Gold color for stars */
+        font-size: 1.05rem;
+    }
+    .item-card-rating .far.fa-star {
+        color: #e0e0e0; /* Lighter grey for empty stars */
+    }
+
+    .item-card-footer {
+        background: #f8f9fa; /* Lighter footer background */
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #eef3f7;
+    }
+    .item-card-button {
+        border-radius: 1.2rem; /* Slightly more rounded button */
+        font-weight: 600;
+        padding: 0.75rem 1.25rem;
+        transition: background-color 0.2s, box-shadow 0.2s;
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%); /* Gradient button */
+        border: none;
+        box-shadow: 0 4px 12px rgba(60,80,180,0.15);
+    }
+    .item-card-button:hover {
+        box-shadow: 0 6px 18px rgba(60,80,180,0.25);
+    }
+
+    /* Filter and Search Section Styling */
+    .filter-card {
+        background: linear-gradient(120deg, #e3f0ff 0%, #f8f9fa 100%);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 30px rgba(60, 80, 180, 0.08);
+        padding: 2rem 2.5rem;
+        margin-bottom: 3rem;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 1rem;
+        border: 1px solid #d0e6ff;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        color: #4a5670;
+    }
+    .filter-card .btn-primary {
+        border-radius: 1rem;
+        font-weight: 600;
+        padding: 0.75rem 1.25rem;
+        background: #3c50b4;
+        border-color: #3c50b4;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+    .filter-card .btn-primary:hover {
+        background: #2a3a5e;
+        border-color: #2a3a5e;
+    }
+
+    /* Pagination Styling */
+    .pagination .page-item .page-link {
+        border-radius: 0.75rem;
+        margin: 0 0.25rem;
+        color: #3c50b4;
+        border: 1px solid #d0e6ff;
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .pagination .page-item .page-link:hover {
+        background-color: #e3f0ff;
+        border-color: #a7d0ff;
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%);
+        border-color: #3c50b4;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(60,80,180,0.2);
+    }
+    .pagination .page-item.active .page-link:hover {
+        background: linear-gradient(90deg, #2a3a5e 0%, #228b3d 100%);
+        border-color: #2a3a5e;
+    }
+</style>
+
+<div class="container">
+    <div class="filter-card">
+        <form method="get" class="row g-3 align-items-end"> {# align-items-end for better vertical alignment #}
+            <div class="col-md-4">
+                <label for="search_query" class="form-label visually-hidden">Search items</label> {# Added label for accessibility #}
+                <input type="text" name="q" id="search_query" class="form-control" placeholder="Search items..." value="{{ current_query|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="category_select" class="form-label visually-hidden">Category</label> {# Added label for accessibility #}
+                <select name="category" id="category_select" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if current_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="sort_select" class="form-label visually-hidden">Sort by</label> {# Added label for accessibility #}
+                <select name="sort" id="sort_select" class="form-select">
+                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        {% for item in items %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4"> {# Adjusted column sizes for better responsiveness and density #}
+            <div class="item-card">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="item-card-img" alt="{{ item.name }}">
+                {% endif %}
+                <div class="item-card-body">
+                    <h5 class="item-card-title">{{ item.name }}</h5>
+                    <p class="item-card-description">{{ item.description|truncatewords:15 }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto"> {# mt-auto pushes content to bottom #}
+                        <span class="item-card-price">
+                            <i class="fas fa-money-bill-wave"></i> TSh {{ item.price_per_day|floatformat:0 }}/day {# CHANGED TO TSH #}
+                        </span>
+                        <div class="item-card-rating">
+                            {% with ''|center:item.average_rating|default_if_none:0 as range %} {# Added default_if_none for items without rating #}
+                            {% for _ in range %}
+                            <i class="fas fa-star"></i>
+                            {% endfor %}
+                            {% comment %} Display empty stars for items with no reviews or partial rating {% endcomment %}
+                            {% for _ in "12345" %}
+                                {% if forloop.counter > item.average_rating|default:0 %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+                <div class="item-card-footer">
+                    <a href="{% url 'rentals:item_detail' item.pk %}" class="btn btn-primary w-100 item-card-button">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h3 style="color:#2a3a5e;">No items found</h3>
+            <p style="color:#4a5670;">Try adjusting your search criteria or browse all items.</p>
+            <a href="{% url 'rentals:item_list' %}" class="btn btn-outline-primary mt-3">Show All Items</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if items.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if items.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ items.previous_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in items.paginator.page_range %}
+            <li class="page-item {% if items.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if current_query %}&q={{ current_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if items.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ items.next_page_number }}{% if current_query %}&q={{ current_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

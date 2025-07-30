@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin Panel - Moshi Rental{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Admin Panel</h1>
+
+    <ul class="nav nav-tabs mb-4" id="adminTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">Items</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Users</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab" aria-controls="bookings" aria-selected="false">Bookings</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabContent">
+        <!-- Items Tab -->
+        <div class="tab-pane fade show active" id="items" role="tabpanel" aria-labelledby="items-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>All Items</h3>
+                <a href="{% url 'rentals:add_item' %}" class="btn btn-success"><i class="fas fa-plus me-2"></i>Add Item</a>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price/Day</th>
+                        <th>Owner</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.category.name }}</td>
+                        <td>${{ item.price_per_day }}</td>
+                        <td>{{ item.owner.username }}</td>
+                        <td>
+                            <a href="{% url 'rentals:edit_item' item.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <form method="post" action="{% url 'rentals:delete_item' item.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">No items found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Users Tab -->
+        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <h3>All Users</h3>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Is Admin</th>
+                        <th>Date Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_obj in users %}
+                    <tr>
+                        <td>{{ user_obj.id }}</td>
+                        <td>{{ user_obj.username }}</td>
+                        <td>{{ user_obj.email }}</td>
+                        <td>
+                            {% if user_obj.is_superuser %}
+                                <span class="badge bg-success">Yes</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user_obj.date_joined|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if request.user.id != user_obj.id %}
+                                <form method="post" action="{% url 'rentals:toggle_admin' user_obj.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    {% if user_obj.is_superuser %}
+                                        <button type="submit" class="btn btn-warning btn-sm">Remove Admin</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-success btn-sm">Make Admin</button>
+                                    {% endif %}
+                                </form>
+                                <form method="post" action="{% url 'rentals:delete_user' user_obj.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">Delete User</button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted">No actions</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">No users found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div class="tab-pane fade" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+            <h3>All Bookings</h3>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Item</th>
+                        <th>Dates</th>
+                        <th>Status</th>
+                        <th>Total Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.user.username }}</td>
+                        <td>{{ booking.item.name }}</td>
+                        <td>{{ booking.start_date|date:"Y-m-d" }} to {{ booking.end_date|date:"Y-m-d" }}</td>
+                        <td><span class="badge bg-info text-dark">{{ booking.get_status_display }}</span></td>
+                        <td>${{ booking.total_price }}</td>
+                        <td>
+                            <form method="post" action="{% url 'rentals:change_booking_status' booking.id %}" class="d-flex">
+                                {% csrf_token %}
+                                <select name="status" class="form-select form-select-sm me-2">
+                                    {% for status_val, status_name in booking_status_choices %}
+                                        <option value="{{ status_val }}" {% if booking.status == status_val %}selected{% endif %}>{{ status_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">No bookings found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

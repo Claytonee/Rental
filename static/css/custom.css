@@ -1,0 +1,31 @@
+/* Custom Moshi Rental color scheme and tweaks */
+body {
+    background-color: #f4f6fa;
+}
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.footer {
+    background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%);
+    color: #fff;
+}
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #0a58ca;
+}
+/* Avatar image tweaks */
+img.rounded-circle {
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+/* Toasts */
+.toast {
+    opacity: 0.98;
+} 

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Edit Review - Moshi Rental{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 text-center">Edit Your Review</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Your Rating</label>
+                            <div class="rating">
+                                {% for i in "54321" %}
+                                <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" {% if review.rating|stringformat:'s' == i %}checked{% endif %} required>
+                                <label for="star{{ i }}"><i class="fas fa-star"></i></label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required>{{ review.comment }}</textarea>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Update Review</button>
+                        </div>
+                    </form>
+                    <a href="{% url 'rentals:item_detail' review.item.pk %}" class="btn btn-link mt-3">Back to Item</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,375 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Moshi Rental{% endblock %}
+
+{% block content %}
+<!-- Modern Hero Section -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    body, h1, h2, h3, h4, h5, h6, p, a, .btn {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .hero-modern {
+        background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%);
+        border-radius: 2rem;
+        box-shadow: 0 8px 32px rgba(60, 80, 180, 0.12);
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+    }
+    .hero-modern h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #2a3a5e;
+    }
+    .hero-modern p {
+        color: #4a5670;
+        font-size: 1.25rem;
+    }
+    .btn-modern {
+        border-radius: 2rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(60,80,180,0.08);
+        transition: box-shadow 0.2s;
+    }
+    .btn-modern:hover {
+        box-shadow: 0 4px 16px rgba(60,80,180,0.16);
+    }
+    .card-modern {
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(60,80,180,0.10);
+        border: none;
+        transition: transform 0.2s;
+    }
+    .card-modern:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 8px 32px rgba(60,80,180,0.18);
+    }
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 2rem;
+        letter-spacing: 0.02em;
+    }
+    .category-icon {
+        color: #3c50b4;
+        background: #e3f0ff;
+        border-radius: 50%;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(60,80,180,0.08);
+    }
+    .featured-img {
+        border-radius: 1.2rem 1.2rem 0 0;
+        object-fit: cover;
+        height: 180px;
+    }
+    .why-modern {
+        background: linear-gradient(120deg, #f8f9fa 60%, #e3f0ff 100%);
+        border-radius: 2rem;
+        box-shadow: 0 4px 24px rgba(60,80,180,0.10);
+        padding: 2.5rem 2rem;
+    }
+    .trusted-star {
+        text-shadow: 0 2px 8px #ffd70099;
+    }
+    .trusted-hover-area { cursor: pointer; }
+    .gift-box-anim {
+        width: 80px;
+        height: 90px;
+        margin-top: 18px;
+        text-align: center;
+        animation: none;
+    }
+    .gift-lid {
+        width: 80px;
+        height: 30px;
+        background: #ff4d4f;
+        border-radius: 8px 8px 0 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .gift-box {
+        width: 80px;
+        height: 60px;
+        background: #fffbe7;
+        border-radius: 0 0 8px 8px;
+        position: absolute;
+        top: 30px;
+        left: 0;
+        border: 3px solid #ff4d4f;
+        z-index: 1;
+    }
+    .gift-ribbon {
+        width: 16px;
+        height: 60px;
+        background: #ffc107;
+        position: absolute;
+        top: 30px;
+        left: 32px;
+        border-radius: 8px;
+        z-index: 2;
+    }
+    .gift-message {
+        position: absolute;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.1em;
+        color: #ff4d4f;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+    .trusted-hover-area:hover .gift-box-anim {
+        display: block;
+        animation: pop-in 0.7s;
+    }
+    .trusted-hover-area:hover .gift-lid {
+        transform: rotate(-35deg) translateY(-18px);
+    }
+    .trusted-hover-area:hover .gift-message {
+        opacity: 1;
+    }
+    @keyframes pop-in {
+        0% { transform: scale(0.5); opacity: 0; }
+        80% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<div class="hero-modern row align-items-center">
+    <div class="col-md-7 text-center text-md-start px-5">
+        <h1>Welcome to Moshi Rental</h1>
+        <p>Find and rent the items you need, when you need them. Fast, secure, and affordable.</p>
+        <div class="d-flex flex-wrap gap-3 mb-3">
+            <a href="{% url 'account_login' %}" class="btn btn-outline-primary btn-lg px-4 btn-modern"><i class="fas fa-sign-in-alt me-2"></i>User Login</a>
+            <a href="/admin/" class="btn btn-outline-dark btn-lg px-4 btn-modern"><i class="fas fa-user-shield me-2"></i>Admin Login</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-primary btn-lg px-4 btn-modern"><i class="fas fa-user-plus me-2"></i>Sign Up</a>
+        </div>
+        <a href="{% url 'rentals:item_list' %}" class="btn btn-success btn-lg mt-2 btn-modern">Browse Items</a>
+    </div>
+    <div class="col-md-5 text-center mt-4 mt-md-0">
+        <img id="hero-slideshow" src="/static/img/event%20venue.jpg" alt="Modern Rental Living Room" class="hero-fade-img" style="max-width: 380px; width: 100%; border-radius: 2rem; box-shadow: 0 10px 32px rgba(60,80,180,0.16); object-fit:cover; height:270px;">
+    </div>
+    <style>
+        .hero-fade-img {
+            opacity: 1;
+            transition: opacity 1s cubic-bezier(.4,0,.2,1);
+        }
+        .hero-fade-img.fade-out {
+            opacity: 0;
+        }
+    </style>
+    <script>
+        const heroImages = [
+            "/static/img/event%20venue.jpg",
+            "/static/img/frame.png",
+            "/static/img/house.jpeg",
+            "/static/img/industrial%20space.avif",
+            "/static/img/industrial%20spacee.jpg",
+            "/static/img/office.jpg",
+            "/static/img/retail.jpg",
+            "/static/img/warehouse.jpg"
+        ];
+        let heroIndex = 0;
+        setInterval(() => {
+            const img = document.getElementById('hero-slideshow');
+            img.classList.add('fade-out');
+            setTimeout(() => {
+                heroIndex = (heroIndex + 1) % heroImages.length;
+                img.src = heroImages[heroIndex];
+                img.classList.remove('fade-out');
+            }, 1000);
+        }, 6500);
+    </script>
+</div>
+
+<section class="my-5">
+    <h2 class="section-title text-center">Categories</h2>
+    <div class="row justify-content-center">
+        {% for category in categories %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card card-modern h-100 text-center p-3">
+                <div class="card-body">
+                    {% if category.image %}
+                        <img src="/media/rental_items/{{ category.image }}" alt="{{ category.name }}" style="width:80px; height:80px; object-fit:cover; border-radius:50%; box-shadow:0 2px 8px rgba(60,80,180,0.10); margin-bottom:1rem;">
+                    {% else %}
+                        <span class="category-icon"><i class="fas fa-{{ category.icon }} fa-2x"></i></span>
+                    {% endif %}
+                    <h5 class="card-title mt-2">{{ category.name }}</h5>
+                    <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
+                    <a href="{% url 'rentals:item_list' %}?category={{ category.id }}" class="btn btn-outline-primary btn-modern mt-2">View Items</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+<section class="my-5" style="background: linear-gradient(120deg, #e3f0ff 60%, #f8f9fa 100%); border-radius: 2rem; box-shadow: 0 8px 32px rgba(60,80,180,0.10); padding: 2.5rem 1rem;">
+    <h2 class="section-title text-center">Featured Items</h2>
+    <style>
+        .news-bar {
+            display: flex;
+            align-items: stretch;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px 0 rgba(60,80,180,0.10);
+            margin: 0 auto 1.2rem auto;
+            max-width: 520px;
+            width: 95%;
+            border: 1.5px solid #e0e0e0;
+            overflow: hidden;
+            height: 32px;
+        }
+        .news-bar .label {
+            background: #3c50b4;
+            color: #fff;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 0.98em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 14px 0 0 14px;
+            border-right: 2px solid #fff;
+            min-width: 90px;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+        .news-bar .scrolling-text-container {
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            background: #3c50b4;
+            display: flex;
+            align-items: center;
+            border-radius: 0 14px 14px 0;
+            padding-left: 10px;
+            height: 100%;
+        }
+        .news-bar .scrolling-text {
+            display: inline-block;
+            white-space: nowrap;
+            animation: scroll-left 32s linear infinite;
+            color: #fff;
+            font-size: 0.98em;
+            padding-left: 100%;
+            font-weight: 500;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        @media (max-width: 600px) {
+            .news-bar { font-size: 0.90em; height: 22px; border-radius: 8px; max-width: 99vw; }
+            .news-bar .label { font-size: 0.80em; padding: 0 4px; border-radius: 8px 0 0 8px; min-width: 50px; }
+            .news-bar .scrolling-text-container { border-radius: 0 8px 8px 0; padding-left: 2px; }
+            .news-bar .scrolling-text { font-size: 0.90em; }
+        }
+    </style>
+    <div class="news-bar">
+        <div class="label">Moshi Rental</div>
+        <div class="scrolling-text-container">
+            <div class="scrolling-text">
+                Discover our most popular rentals, handpicked for quality, value, and style. Book now and enjoy a seamless experience!
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        {% for item in featured_items %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 text-center p-2" style="border-radius:1.5rem; box-shadow:0 8px 32px rgba(60,80,180,0.18); border:none; background:#fff; transition:transform 0.2s, box-shadow 0.2s;">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="card-img-top featured-img" alt="{{ item.name }}" style="height:180px; object-fit:cover; border-radius:1.2rem 1.2rem 0 0;">
+                {% endif %}
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-2" style="color:#3c50b4; font-weight:700; font-size:1.2rem;">{{ item.name }}</h5>
+                    <p class="card-text text-muted mb-2" style="min-height:48px; font-size:1rem;">{{ item.description|truncatewords:15 }}</p>
+                    <div class="mb-2">
+                        <span style="background:#eafbe7; color:#28a745; font-weight:600; border-radius:1rem; padding:0.3rem 1rem; font-size:1.05rem;">
+                            <i class="fas fa-money-bill-wave me-1"></i> TSh {{ item.price_per_day }}/day
+                        </span>
+                    </div>
+                    <a href="{% url 'rentals:item_detail' item.pk %}" class="btn btn-primary btn-modern shadow" style="font-size:1rem;">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="my-5 why-modern">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h2 class="mb-3" style="color:#2a3a5e; font-weight:800; letter-spacing:0.01em;">Why Choose Moshi Rental?</h2>
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6">
+                        <div class="p-3 rounded shadow-sm bg-white d-flex align-items-center gap-3" style="border-left:6px solid #3c50b4;">
+                            <span class="d-flex align-items-center justify-content-center" style="background:#e3f0ff; border-radius:50%; width:48px; height:48px;"><i class="fas fa-th-large fa-lg text-primary"></i></span>
+                            <div>
+                                <div class="fw-bold" style="color:#3c50b4;">Huge Variety</div>
+                                <small class="text-muted">Choose from apartments, offices, vehicles, and more.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="p-3 rounded shadow-sm bg-white d-flex align-items-center gap-3" style="border-left:6px solid #28a745;">
+                            <span class="d-flex align-items-center justify-content-center" style="background:#eafbe7; border-radius:50%; width:48px; height:48px;"><i class="fas fa-tags fa-lg text-success"></i></span>
+                            <div>
+                                <div class="fw-bold" style="color:#28a745;">Affordable Rates</div>
+                                <small class="text-muted">Enjoy competitive daily prices for every budget.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="p-3 rounded shadow-sm bg-white d-flex align-items-center gap-3" style="border-left:6px solid #17a2b8;">
+                            <span class="d-flex align-items-center justify-content-center" style="background:#e3f7fa; border-radius:50%; width:48px; height:48px;"><i class="fas fa-lock fa-lg text-info"></i></span>
+                            <div>
+                                <div class="fw-bold" style="color:#17a2b8;">Secure Booking</div>
+                                <small class="text-muted">Your data and payments are always protected.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="p-3 rounded shadow-sm bg-white d-flex align-items-center gap-3" style="border-left:6px solid #ffc107;">
+                            <span class="d-flex align-items-center justify-content-center" style="background:#fffbe7; border-radius:50%; width:48px; height:48px;"><i class="fas fa-headset fa-lg text-warning"></i></span>
+                            <div>
+                                <div class="fw-bold" style="color:#ffc107;">24/7 Support</div>
+                                <small class="text-muted">Friendly help whenever you need it.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-light rounded shadow-sm text-center">
+                    <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                    <div class="fw-bold" style="color:#3c50b4;">98% Customer Satisfaction</div>
+                    <small class="text-muted">Thousands of happy renters trust Moshi Rental.</small>
+                </div>
+                <div class="mt-3 text-center">
+                    <a href="{% url 'rentals:item_list' %}" class="btn btn-primary btn-lg px-4 btn-modern shadow">Get Started Now</a>
+                </div>
+            </div>
+            <div class="col-md-6 text-center trusted-hover-area" style="position:relative;">
+                <i class="fas fa-star fa-5x text-warning trusted-star"></i>
+                <h3 class="mt-3" style="color:#3c50b4;">Trusted by Thousands</h3>
+                <p class="text-muted">Join our community of satisfied customers today!</p>
+                <div class="gift-box-anim" style="position:absolute; left:50%; top:60%; transform:translate(-50%,0); display:none; z-index:2;">
+                    <div class="gift-lid"></div>
+                    <div class="gift-box"></div>
+                    <div class="gift-ribbon"></div>
+                    <div class="gift-message">🎉 Hongera! 🎁</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

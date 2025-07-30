@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - Moshi Rental{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Payment Details</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Booking Summary -->
+                    <div class="mb-4">
+                        <h4>Booking Summary</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Item:</strong> {{ booking.item.name }}</p>
+                                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Total Days:</strong> {{ booking.end_date|timeuntil:booking.start_date }}</p>
+                                <p><strong>Price per Day:</strong> Tsh {{ booking.item.price_per_day }}</p>
+                                <p><strong>Total Amount:</strong> Tsh {{ booking.total_price }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Payment Form -->
+                    <form id="payment-form" class="mb-4">
+                        <div class="mb-3">
+                            <label for="card-element" class="form-label">Credit or Debit Card</label>
+                            <div id="card-element" class="form-control">
+                                <!-- Stripe Card Element will be inserted here -->
+                            </div>
+                            <div id="card-errors" class="invalid-feedback" role="alert"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100" id="submit-button">
+                            Pay Tsh {{ booking.total_price }}
+                        </button>
+                    </form>
+                    
+                    <!-- Payment Status -->
+                    <div id="payment-status" class="alert d-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Initialize Stripe
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    
+    // Create card element
+    const card = elements.create('card');
+    card.mount('#card-element');
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const statusDiv = document.getElementById('payment-status');
+    
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        
+        try {
+            const { paymentIntent, error } = await stripe.confirmCardPayment(
+                '{{ payment.stripe_payment_id }}',
+                {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: '{{ request.user.get_full_name }}',
+                            email: '{{ request.user.email }}'
+                        }
+                    }
+                }
+            );
+            
+            if (error) {
+                // Handle error
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.textContent = error.message;
+                submitButton.disabled = false;
+            } else {
+                // Payment successful
+                statusDiv.className = 'alert alert-success';
+                statusDiv.textContent = 'Payment successful! Redirecting...';
+                
+                // Redirect to booking detail page
+                setTimeout(() => {
+                    window.location.href = "{% url 'bookings:booking_detail' booking.id %}";
+                }, 2000);
+            }
+        } catch (error) {
+            statusDiv.className = 'alert alert-danger';
+            statusDiv.textContent = 'An error occurred. Please try again.';
+            submitButton.disabled = false;
+        }
+    });
+    
+    // Handle card element errors
+    card.addEventListener('change', (event) => {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+</script>
+{% endblock %} 

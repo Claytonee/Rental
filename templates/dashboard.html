@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+    body, h1, h2, h3, h4, h5, h6, p, a, .btn {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .dashboard-artboard {
+        background: linear-gradient(120deg, #e3f0ff 0%, #f8f9fa 100%);
+        border-radius: 2.5rem;
+        box-shadow: 0 12px 48px rgba(60,80,180,0.13);
+        padding: 3.5rem 2rem 2.5rem 2rem;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+        display: flex; /* Added for better layout control */
+        flex-wrap: wrap; /* Added for responsiveness */
+        align-items: center; /* Vertically center content */
+        justify-content: space-between; /* Space out children */
+    }
+    .dashboard-artboard::before {
+        content: "";
+        position: absolute;
+        top: -60px; left: -60px;
+        width: 180px; height: 180px;
+        background: radial-gradient(circle, #3c50b4 0%, #e3f0ff 80%);
+        opacity: 0.18;
+        border-radius: 50%;
+        z-index: 0;
+    }
+    .dashboard-artboard::after {
+        content: "";
+        position: absolute;
+        bottom: -80px; right: -80px;
+        width: 220px; height: 220px;
+        background: radial-gradient(circle, #28a745 0%, #e3f0ff 80%);
+        opacity: 0.13;
+        border-radius: 50%;
+        z-index: 0;
+    }
+    .dashboard-hero {
+        position: relative;
+        z-index: 1;
+        text-align: left;
+        padding-bottom: 1.5rem;
+        flex: 1; /* Allow hero section to take available space */
+        min-width: 300px; /* Minimum width before wrapping */
+    }
+    .dashboard-hero h2 {
+        font-size: 2.8rem; /* Slightly larger for impact */
+        font-weight: 800;
+        color: #2a3a5e;
+        letter-spacing: 0.01em;
+        margin-bottom: 0.7rem; /* Adjusted margin */
+        animation: fadeInDown 1.2s;
+    }
+    .dashboard-hero .greeting-anim {
+        display: inline-block;
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 1.2rem;
+        padding: 0.4rem 1.2rem;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 12px rgba(60,80,180,0.10);
+        animation: popIn 1.1s;
+        margin-bottom: 1rem; /* Added margin below greeting */
+    }
+    @keyframes fadeInDown {
+        0% { opacity: 0; transform: translateY(-30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+        0% { opacity: 0; transform: scale(0.7); }
+        80% { opacity: 1; transform: scale(1.08); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    .dashboard-actions {
+        margin-top: 2.2rem;
+        z-index: 1;
+        width: 100%; /* Ensure it takes full width within its parent */
+    }
+    .action-card {
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px rgba(60,80,180,0.14);
+        background: #fff;
+        transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+        text-align: center;
+        padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-decoration: none !important;
+    }
+    .action-card:visited, .action-card:active, .action-card:focus {
+        text-decoration: none !important;
+    }
+    .action-card .card-title, .action-card .card-desc {
+        text-decoration: none !important;
+    }
+    .action-card:hover {
+        transform: translateY(-6px) scale(1.04);
+        box-shadow: 0 16px 48px rgba(60,80,180,0.18);
+        background: linear-gradient(120deg, #e3f0ff 60%, #f8f9fa 100%);
+    }
+    .action-card i {
+        font-size: 2.8rem; /* Slightly larger icon */
+        margin-bottom: 0.9rem; /* Adjusted margin */
+        color: #3c50b4;
+        transition: color 0.3s;
+    }
+    .action-card:hover i {
+        color: #28a745;
+    }
+    .action-card .card-title {
+        font-size: 1.25rem; /* Slightly larger title */
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 0.4rem; /* Adjusted margin */
+    }
+    .action-card .card-desc {
+        font-size: 1rem; /* Slightly larger description */
+        color: #4a5670;
+        margin-bottom: 0.2rem;
+    }
+    .dashboard-art {
+        max-width: 400px; /* Increased max-width for image */
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 2rem;
+        box-shadow: 0 8px 32px rgba(60,80,180,0.15);
+        object-fit:cover;
+        height:260px; /* Increased height for image */
+        animation: fadeInUp 1.2s;
+        margin-top: 1.5rem; /* Add some space on smaller screens */
+    }
+    @media (min-width: 768px) { /* Adjust for medium screens and up */
+        .dashboard-art {
+            margin-top: 0; /* Remove top margin on larger screens */
+        }
+        .dashboard-hero {
+            padding-right: 2rem; /* Add some padding to hero section */
+        }
+    }
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .info-card, .ann-card {
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 24px rgba(60,80,180,0.10);
+        border: none;
+        background: #fff;
+        transition: box-shadow 0.2s, transform 0.2s;
+        margin-bottom: 1.5rem; /* Increased margin-bottom for better spacing */
+        padding: 1.5rem; /* Added padding to cards */
+    }
+    .info-card:hover, .ann-card:hover {
+        box-shadow: 0 8px 32px rgba(60,80,180,0.18);
+        transform: translateY(-4px) scale(1.02);
+    }
+    .info-card .card-body, .ann-card .card-body {
+        padding: 0; /* Remove default card-body padding if needed, or adjust above */
+    }
+    .profile-progress {
+        width: 100%;
+        height: 12px;
+        background: #e3f0ff;
+        border-radius: 8px;
+        margin: 0.7rem 0 1.2rem 0;
+        overflow: hidden;
+    }
+    .profile-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%);
+        border-radius: 8px;
+        width: 80%; /* Example width, dynamic based on actual progress */
+        animation: progressGrow 1.2s;
+    }
+    @keyframes progressGrow {
+        0% { width: 0; }
+        100% { width: 80%; } /* This should ideally be dynamic */
+    }
+
+    /* General spacing and alignment adjustments */
+    .container {
+        max-width: 1200px; /* Max width for content */
+    }
+    .mb-4 {
+        margin-bottom: 1.5rem !important; /* Slightly increased general bottom margin */
+    }
+</style>
+
+<div class="container py-5">
+    <div class="dashboard-artboard">
+        <div class="dashboard-hero">
+            <span class="greeting-anim">👋 Welcome, {{ user.get_full_name|default:user.username }}!</span>
+            <h2 class="fw-bold mb-2">Your Ultra HD Dashboard</h2>
+            <p class="lead mb-2">Manage your bookings, add new items, and explore your profile in style. Enjoy a modern, interactive experience!</p>
+            <div class="profile-progress">
+                <div class="profile-progress-bar"></div>
+            </div>
+            <div class="row dashboard-actions mt-3">
+                <div class="col-6 col-md-4 mb-3">
+                    <a href="{% url 'bookings:list' %}" class="action-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="card-title">My Bookings</div>
+                        <div class="card-desc">View & manage your reservations</div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 mb-3">
+                    <a href="{% url 'rentals:add_item' %}" class="action-card">
+                        <i class="fas fa-plus"></i>
+                        <div class="card-title">Add Item</div>
+                        <div class="card-desc">List something new for rent</div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-4 mb-3">
+                    <a href="{% url 'rentals:user_items' %}" class="action-card">
+                        <i class="fas fa-boxes"></i>
+                        <div class="card-title">My Items</div>
+                        <div class="card-desc">See all your listed items</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 text-center order-md-last" style="position:relative; min-height:400px;">
+            <video id="dashboard-art-video" class="dashboard-art" style="background:#e3f0ff; position:absolute; left:0; top:0; width:520px; max-width:100%; height:400px; object-fit:cover; border-radius:2rem;" muted>
+                <source src="/static/img/7579428-uhd_2160_3840_30fps.mp4" type="video/mp4">
+            </video>
+            <button id="dashboard-art-prev" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); z-index:2; background:rgba(60,80,180,0.18); border:none; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:1.15rem; color:#3c50b4; cursor:pointer; box-shadow:0 2px 8px rgba(60,80,180,0.10);">
+                &#8592;
+            </button>
+            <button id="dashboard-art-next" style="position:absolute; right:18px; top:50%; transform:translateY(-50%); z-index:2; background:rgba(60,80,180,0.18); border:none; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:1.15rem; color:#3c50b4; cursor:pointer; box-shadow:0 2px 8px rgba(60,80,180,0.10);">
+                &#8594;
+            </button>
+            <script>
+                const videoList = [
+                    '/static/img/7579428-uhd_2160_3840_30fps.mp4',
+                    '/static/img/Apartment%20Videos,%20Download%20The%20BEST%20Free%204k%20Stock%20Video%20Footage%20%26%20Apartment%20HD%20Video%20Clips.mp4',
+                    '/static/img/House%20Videos,%20Download%20The%20BEST%20Free%204k%20Stock%20Video%20Footage%20%26%20House%20HD%20Video%20Clips.mp4',
+                    '/static/img/Industrial%20Videos,%20Download%20The%20BEST%20Free%204k%20Stock%20Video%20Footage%20%26%20Industrial%20HD%20Video%20Clips.mp4',
+                    '/static/img/Office%20Workspace%20Videos,%20Download%20The%20BEST%20Free%204k%20Stock%20Video%20Footage%20%26%20Office%20Workspace%20HD%20Video%20Clips.mp4',
+                    '/static/img/Event%20Venue%20Videos,%20Download%20The%20BEST%20Free%204k%20Stock%20Video%20Footage%20%26%20Event%20Venue%20HD%20Video%20Clips.mp4'
+                ];
+                const artVideo = document.getElementById('dashboard-art-video');
+                const prevBtn = document.getElementById('dashboard-art-prev');
+                const nextBtn = document.getElementById('dashboard-art-next');
+                let videoIndex = 0;
+                function playVideo(idx) {
+                    videoIndex = (idx + videoList.length) % videoList.length;
+                    artVideo.src = videoList[videoIndex];
+                    artVideo.load();
+                    artVideo.play();
+                }
+                function playNextVideo() {
+                    playVideo(videoIndex + 1);
+                }
+                function playPrevVideo() {
+                    playVideo(videoIndex - 1);
+                }
+                artVideo.onended = playNextVideo;
+                nextBtn.onclick = playNextVideo;
+                prevBtn.onclick = playPrevVideo;
+                playVideo(0);
+            </script>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card info-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="me-3" style="font-size:2.2rem; color:#3c50b4;"><i class="fas fa-user-circle"></i></span>
+                        <h5 class="card-title mb-0" style="font-size:1.35rem; font-weight:700; color:#2a3a5e;">Your Info</h5>
+                    </div>
+                    <ul class="list-unstyled mb-0" style="margin-left:0.2rem;">
+                        <li><strong>Name:</strong> {{ user.get_full_name|default:user.username }}</li>
+                        <li><strong>Email:</strong> {{ user.email }}</li>
+                        <li><strong>Member since:</strong> {{ user.date_joined|date:"F Y" }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card ann-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="me-3" style="font-size:2.2rem; color:#28a745;"><i class="fas fa-bullhorn"></i></span>
+                        <h5 class="card-title mb-0" style="font-size:1.35rem; font-weight:700; color:#2a3a5e;">Announcements</h5>
+                    </div>
+                    <ul class="mb-0" style="margin-left:0.2rem;">
+                        <li>Check out our new arrivals in the <a href="{% url 'rentals:item_list' %}">Browse Items</a> section!</li>
+                        <li>Need help? Visit our support page or contact us anytime.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

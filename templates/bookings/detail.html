@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Booking Details - Moshi Rental{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Booking Details</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ booking.item.name }}</h5>
+            <p><strong>Status:</strong> <span class="badge bg-{{ booking.status|yesno:'success,warning,danger,secondary' }}">{{ booking.status|title }}</span></p>
+            <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+            <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+            <p><strong>Total Price:</strong> Tsh {{ booking.total_price }}</p>
+            <p><strong>Payment Status:</strong> <span class="badge bg-{{ booking.payment.status|yesno:'success,warning,info,danger' }}">{{ booking.payment.status|title }}</span></p>
+            <p><strong>Booked On:</strong> {{ booking.created_at|date:"F j, Y" }}</p>
+        </div>
+        <div class="card-footer bg-white">
+            <a href="{% url 'bookings:list' %}" class="btn btn-secondary">Back to My Bookings</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

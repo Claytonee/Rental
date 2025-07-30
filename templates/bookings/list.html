@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - Moshi Rental{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* General Styles for a Modern Look (re-using from other templates) */
+    body, h1, h2, h3, h4, h5, h6, p, a, .btn {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .container {
+        padding-top: 2rem; /* Reduced padding-top for a more compact page */
+        padding-bottom: 2rem; /* Reduced padding-bottom */
+    }
+    /* UPDATED STYLE FOR THE PAGE HEADER - MORE COMPACT */
+    .page-header-custom {
+        background: linear-gradient(120deg, #e3f0ff 0%, #f8f9fa 100%);
+        border-radius: 1.2rem; /* Slightly smaller border radius for compactness */
+        box-shadow: 0 6px 20px rgba(60, 80, 180, 0.07); /* Softer shadow */
+        padding: 1.2rem 1.5rem; /* SIGNIFICANTLY REDUCED PADDING */
+        margin-bottom: 2rem; /* Reduced margin below the header */
+        text-align: center;
+    }
+    .page-header-custom h2 {
+        font-size: 2rem; /* Reduced font size for the title */
+        font-weight: 800;
+        color: #2a3a5e;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5rem; /* Reduced margin below the title for closer underline */
+        position: relative;
+    }
+    .page-header-custom h2::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px; /* Closer to the text */
+        transform: translateX(-50%);
+        width: 60px; /* Shorter underline */
+        height: 3px; /* Thinner underline */
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%);
+        border-radius: 1.5px;
+    }
+
+
+    /* Booking Card Styles - Modernized & Compact */
+    .booking-item-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 6px 20px rgba(60, 80, 180, 0.07);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .booking-item-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(60, 80, 180, 0.1);
+    }
+    .booking-item-card .card-body {
+        padding: 1.2rem;
+        flex-grow: 1;
+    }
+    .booking-item-card .card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #3c50b4;
+        margin-bottom: 0.4rem;
+    }
+    .booking-detail-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.2rem;
+        padding: 0.2rem 0;
+    }
+    .booking-detail-line strong {
+        font-size: 0.85rem;
+        color: #2a3a5e;
+        font-weight: 600;
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+    .booking-detail-line span {
+        font-size: 0.85rem;
+        color: #4a5670;
+        font-weight: 500;
+        text-align: right;
+        flex-grow: 1;
+    }
+
+    /* Status Badges */
+    .booking-status-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+    .booking-item-card .badge.bg-warning { background-color: #ffc107 !important; color: #4a5670 !important; }
+    .booking-item-card .badge.bg-info { background-color: #17a2b8 !important; color: #fff !important; }
+
+    /* Total Price Display - Highly Compacted & Visually Appealing */
+    .total-price-display {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #28a745;
+        background: #eafbe7;
+        padding: 0.3rem 0.7rem;
+        border-radius: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        box-shadow: 0 1px 4px rgba(40,167,69,0.06);
+        margin-top: 0.5rem;
+    }
+    .total-price-display i {
+        font-size: 0.9rem;
+        color: #28a745;
+    }
+
+    /* Card Footer Buttons - Highly Compacted */
+    .booking-item-card .card-footer {
+        background: #f8f9fa;
+        border-top: 1px solid #eef3f7;
+        padding: 0.8rem 1.2rem;
+    }
+    .booking-item-card .btn-primary,
+    .booking-item-card .btn-outline-danger {
+        border-radius: 1rem;
+        padding: 0.4rem 0.9rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 1px 6px rgba(60,80,180,0.08);
+    }
+    .booking-item-card .btn-primary:hover,
+    .booking-item-card .btn-outline-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(60,80,180,0.12);
+    }
+
+    /* No Bookings Alert - Compacted */
+    .alert.alert-info.text-center {
+        padding: 1.2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(60,80,180,0.1);
+    }
+    .alert.alert-info.text-center .alert-heading {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .alert.alert-info.text-center p {
+        font-size: 0.95rem;
+    }
+    .alert.alert-info.text-center .btn-modern {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 767.98px) {
+        .booking-detail-line {
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        .booking-detail-line strong {
+            margin-bottom: 0.1rem;
+        }
+        .booking-detail-line span {
+            text-align: left;
+        }
+    }
+</style>
+
+<div class="container">
+    {# UPDATED HEADER FOR THE PAGE - MORE COMPACT #}
+    <div class="page-header-custom">
+        <h2>My Bookings</h2>
+    </div>
+    
+    {% if bookings %}
+    <div class="row">
+        {% for booking in bookings %}
+        <div class="col-md-6 mb-4">
+            <div class="booking-item-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ booking.item.name }}</h5>
+                        <span class="badge booking-status-badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ booking.status|title }}
+                        </span>
+                    </div>
+                    
+                    <div class="booking-detail-line">
+                        <strong>Start Date:</strong>
+                        <span>{{ booking.start_date|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="booking-detail-line">
+                        <strong>End Date:</strong>
+                        <span>{{ booking.end_date|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="booking-detail-line">
+                        <strong>Total Days:</strong>
+                        <span>{{ booking.end_date|timeuntil:booking.start_date }}</span> 
+                    </div>
+                    <div class="booking-detail-line">
+                        <strong>Total Price:</strong>
+                        <span>
+                            <span class="total-price-display">
+                                <i class="fas fa-money-bill-wave"></i> TSh {{ booking.total_price|floatformat:0 }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="booking-detail-line">
+                        <strong>Payment Status:</strong>
+                        <span>
+                            <span class="badge booking-status-badge {% if booking.payment.status == 'completed' %}bg-success{% elif booking.payment.status == 'pending' %}bg-warning{% elif booking.payment.status == 'refunded' %}bg-info{% else %}bg-danger{% endif %}">
+                                {{ booking.payment.status|title }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="booking-detail-line">
+                        <strong>Booked On:</strong>
+                        <span>{{ booking.created_at|date:"F j, Y" }}</span>
+                    </div>
+                    
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-primary">View Details</a>
+                        {% if booking.status in 'pending,confirmed' %}
+                        <form action="{% url 'bookings:cancel_booking' booking.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this booking? This action cannot be undone.');">Cancel Booking</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-5">
+        <h4 class="alert-heading">No Bookings Yet!</h4>
+        <p>It looks like you haven't made any reservations. Start exploring our wide range of items.</p>
+        <hr>
+        <a href="{% url 'rentals:item_list' %}" class="btn btn-primary btn-modern">Browse available items</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

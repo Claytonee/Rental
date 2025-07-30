@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.name }} - Moshi Rental{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* General Styles for a Modern Look */
+    body, h1, h2, h3, h4, h5, h6, p, a, .btn {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    /* Modern Card Styles */
+    .modern-card {
+        background: #fff;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(60, 80, 180, 0.08);
+        border: none;
+        overflow: hidden; /* Ensures image corners match card border-radius */
+        margin-bottom: 2.5rem; /* Increased spacing between cards */
+    }
+
+    /* Item Header Section */
+    .item-header-section {
+        background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%);
+        border-radius: 1.5rem; /* Match card radius */
+        padding: 2.5rem;
+        position: relative;
+        z-index: 1; /* Ensure content is above any background effects */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    .item-header-section h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #2a3a5e;
+        margin-bottom: 0.5rem;
+    }
+    .item-header-section .price-tag {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #3c50b4;
+        background: #e3f0ff;
+        padding: 0.5rem 1.5rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 2px 10px rgba(60,80,180,0.1);
+        display: inline-block; /* To contain padding nicely */
+        margin-bottom: 0.75rem;
+    }
+    .item-header-section .star-rating-display {
+        font-size: 1.25rem;
+        color: #ffc107; /* Warning color for stars */
+    }
+    .item-header-section .review-count {
+        color: #6c757d; /* Muted text for review count */
+        font-weight: 500;
+        margin-left: 0.5rem;
+    }
+
+    /* Item Image */
+    .item-hero-image {
+        width: 100%;
+        height: 450px; /* Larger image height for visual impact */
+        object-fit: cover;
+        border-radius: 1.5rem 1.5rem 0 0; /* Rounded top corners, sharp bottom to match card */
+    }
+    @media (max-width: 767.98px) {
+        .item-hero-image {
+            height: 300px; /* Adjust height for smaller screens */
+        }
+    }
+
+    /* Item Description & Features */
+    .item-description-section {
+        padding: 2.5rem;
+    }
+    .item-description-section h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 1.5rem;
+    }
+    .item-description-section p {
+        color: #4a5670;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+    .item-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    .feature-badge {
+        background: #f0f4f8; /* Light background for badges */
+        color: #3c50b4;
+        padding: 0.75rem 1.25rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(60,80,180,0.05);
+    }
+    .feature-badge i {
+        font-size: 1.1rem;
+        color: #28a745; /* Green icon for features */
+    }
+
+    /* Booking Form Section */
+    .booking-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(60, 80, 180, 0.1);
+        padding: 2.5rem;
+        position: sticky; /* Keeps it on screen while scrolling */
+        top: 20px; /* Distance from top */
+        border: 1px solid #e3f0ff;
+    }
+    .booking-card h3 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 1.5rem;
+    }
+    .booking-card .form-control {
+        border-radius: 0.75rem;
+        padding: 0.8rem 1rem;
+        border: 1px solid #d0e6ff;
+        font-size: 1rem;
+    }
+    .booking-card .form-label {
+        font-weight: 600;
+        color: #4a5670;
+    }
+    .booking-card .price-display {
+        background: #eafbe7; /* Light green background for price */
+        color: #28a745;
+        font-weight: 700;
+        border-radius: 1rem;
+        padding: 0.8rem 1.2rem;
+        font-size: 1.2rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(40,167,69,0.08);
+        margin-bottom: 1.5rem;
+    }
+    .booking-card .btn-primary {
+        background: linear-gradient(90deg, #3c50b4 0%, #28a745 100%);
+        border: none;
+        border-radius: 1.5rem;
+        padding: 0.9rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.15rem;
+        box-shadow: 0 4px 15px rgba(60,80,180,0.25);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .booking-card .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(60,80,180,0.35);
+    }
+
+    /* Reviews Section */
+    .reviews-section {
+        background: #fbfdff; /* Slightly different background for reviews */
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(60, 80, 180, 0.08);
+        padding: 2.5rem;
+        margin-top: 2.5rem;
+    }
+    .reviews-section h3 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #2a3a5e;
+        margin-bottom: 1.5rem;
+    }
+    .review-form-rating .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .review-form-rating input {
+        display: none;
+    }
+    .review-form-rating label {
+        cursor: pointer;
+        font-size: 2rem; /* Larger stars for review input */
+        color: #ccc;
+        padding: 0 0.1em;
+        transition: color 0.2s;
+    }
+    .review-form-rating input:checked ~ label,
+    .review-form-rating label:hover,
+    .review-form-rating label:hover ~ label {
+        color: #ffd700; /* Gold color for selected stars */
+    }
+    .reviews-list .review-item {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #eef3f7;
+    }
+    .reviews-list .review-item:last-child {
+        border-bottom: none;
+    }
+    .reviews-list .review-item strong {
+        color: #3c50b4;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .reviews-list .review-item .text-warning {
+        font-size: 1rem; /* Adjust star size for displayed reviews */
+    }
+    .reviews-list .review-item .text-muted {
+        font-size: 0.9rem;
+    }
+    .reviews-list .review-item p {
+        color: #4a5670;
+        margin-top: 0.5rem;
+        line-height: 1.6;
+    }
+    .reviews-list .alert {
+        border-radius: 1rem;
+    }
+    .reviews-list .alert a {
+        font-weight: 600;
+    }
+
+    /* Custom Input Date styling (optional, requires JavaScript for full browser compatibility) */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+    }
+    input[type="date"] {
+        position: relative;
+    }
+    input[type="date"]::after {
+        content: "\f073"; /* Font Awesome calendar icon */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #3c50b4;
+        pointer-events: none; /* Make sure it doesn't block click */
+    }
+
+    .alert-payment-error {
+        background-color: #ffe6e6; /* Light red */
+        color: #d90000; /* Darker red */
+        border: 1px solid #ffb3b3;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .alert-payment-error i {
+        font-size: 1.5rem;
+        color: #d90000;
+    }
+
+</style>
+
+<div class="container">
+    <div class="row gx-5"> {# Added gx-5 for more horizontal spacing #}
+        <div class="col-md-7"> {# Changed to col-md-7 for better balance #}
+            <div class="modern-card">
+                <img src="{{ item.image.url }}" class="item-hero-image" alt="{{ item.name }}">
+                <div class="item-description-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h1 class="mb-0">{{ item.name }}</h1>
+                        <div class="star-rating-display">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <span class="review-count">({{ reviews.count }} reviews)</span>
+                        </div>
+                    </div>
+                    
+                    <p class="mb-4">{{ item.description }}</p>
+                    
+                    <div class="item-features">
+                        <span class="feature-badge"><i class="fas fa-bed"></i> {{ item.beds|default:"-" }} bed</span>
+                        <span class="feature-badge"><i class="fas fa-couch"></i> {{ item.furniture_type|default:"N/A" }}</span>
+                        <span class="feature-badge"><i class="fas fa-tag"></i> Category: {{ item.category.name }}</span>
+                        <span class="feature-badge"><i class="fas fa-user-circle"></i> Owner: {{ item.owner.username }}</span>
+                        <span class="feature-badge"><i class="fas fa-calendar-alt"></i> Listed: {{ item.created_at|date:"F j, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modern-card reviews-section">
+                <h3 class="mb-4">Reviews</h3>
+                
+                {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if user.is_authenticated %}
+                    {% if not user_review %}
+                    <form method="post" action="" class="mb-4 review-form-rating">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Your Rating</label>
+                            <div class="rating">
+                                {% for i in "54321" %}
+                                <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" required>
+                                <label for="star{{ i }}"><i class="fas fa-star"></i></label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Share your thoughts about this item..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-modern">Submit Review</button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info mb-4">
+                        You have already reviewed this item.
+                        <a href="{% url 'rentals:edit_review' user_review.pk %}" class="btn btn-sm btn-outline-primary ms-2">Edit Review</a>
+                        {# MODIFIED DELETE BUTTON TO USE A FORM #}
+                        <form action="{% url 'rentals:delete_review' user_review.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-2" onclick="return confirm('Are you sure you want to delete this review? This action cannot be undone.');">Delete Review</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="alert alert-info text-center">
+                    Please <a href="{% url 'account_login' %}">login</a> to leave a review.
+                </div>
+                {% endif %}
+                
+                <hr class="my-4">
+                
+                <div class="reviews-list">
+                    {% if reviews %}
+                    {% for review in reviews %}
+                    <div class="review-item mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ review.user.username }}</strong>
+                                <div class="text-warning">
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                        </div>
+                        <p class="mb-0">{{ review.comment }}</p>
+                    </div>
+                    {% if not forloop.last %}<hr class="my-3">{% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">No reviews yet. Be the first to review this item!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-5"> {# Changed to col-md-5 for better balance #}
+            <div class="booking-card">
+                <h3 class="mb-4 text-center">Book This Item</h3>
+                
+                {# Display payment error if any (from previous interaction) #}
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if 'Payment error' in message.message or 'item is not available' in message.message %}
+                            <div class="alert-payment-error mb-4">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                {{ message }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'bookings:create_booking' item.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                   <div class="price-display">
+                        <i class="fas fa-money-bill-wave me-2"></i> TSh {{ item.price_per_day|floatformat:0 }}/day
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Proceed to Payment</button>
+                </form>
+                {% else %}
+                <div class="alert alert-info text-center">
+                    Please <a href="{% url 'account_login' %}">login</a> to book this item.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

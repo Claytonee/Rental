@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Add Category - Moshi Rental{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 text-center">Add New Category</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-success btn-lg">Add Category</button>
+                        </div>
+                    </form>
+                    <a href="{% url 'rentals:add_item' %}" class="btn btn-link mt-3">Back to Add Item</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

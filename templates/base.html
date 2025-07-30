@@ -1,0 +1,465 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Moshi Rental System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Premium Glassmorphism Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light py-2 nav-luxury-glass" style="background: linear-gradient(90deg, #e0e6f0 0%, #f5f7fa 100%); border-bottom: 2.5px solid #6dd5ed; font-family: 'Inter', 'Poppins', sans-serif; position:relative; z-index:100;">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'rentals:home' %}" style="font-weight:900; font-size:1.6rem; color:#23272b; letter-spacing:2px; text-shadow:0 2px 12px #6dd5ed33;">
+          <span class="logo-gradient-ring">
+            <img src="/static/img/NasraLogo.jpg" alt="Nasrah Amour Logo" width="52" height="52" style="border-radius:18px; box-shadow:0 6px 24px #6dd5ed44; object-fit:cover; background:#fff;">
+          </span>
+          <span>Moshi Rental</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto gap-2">
+            <li class="nav-item">
+              <a class="nav-link px-4 py-2 rounded-pill nav-modern nav-underline" href="{% url 'rentals:item_list' %}"><i class="fas fa-boxes me-2"></i>Browse Items</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto gap-2 align-items-center">
+            {% if user.is_authenticated and user.is_superuser %}
+              <li class="nav-item">
+                <a class="nav-link px-4 py-2 rounded-pill nav-modern nav-underline" href="{% url 'rentals:go_to_admin' %}"><i class="fas fa-user-shield me-2"></i>Admin Dashboard</a>
+              </li>
+            {% endif %}
+            {% if user.is_authenticated %}
+              <li class="nav-item d-none d-lg-block">
+                <span class="navbar-text fw-bold text-primary-emphasis me-2 welcome-animated" style="font-size:1.08rem; letter-spacing:0.5px; background:rgba(255,255,255,0.85); border-radius:1.2rem; padding:0.4rem 1.2rem; box-shadow:0 2px 12px #6dd5ed33; border:2px solid #6dd5ed; display:inline-block; animation: welcomeFadeIn 1.1s cubic-bezier(.4,0,.2,1);">
+                  Welcome, <span class="fw-bold text-info">{{ user.first_name|default:user.username }}</span>!
+                </span>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link nav-bell position-relative px-2" href="#" title="Notifications" onclick="event.preventDefault();this.classList.toggle('active');">
+                  <i class="fas fa-bell fa-lg"></i>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn" style="font-size:0.7rem;">1</span>
+                </a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-4 py-2 rounded-pill nav-modern nav-underline" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background:rgba(109,213,237,0.10);">
+                  <span class="avatar-gradient-ring">
+                    <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/img/defaultAvatar.png{% endif %}"
+                         alt="Avatar" width="46" height="46"
+                         style="border-radius:50%; object-fit:cover; background:#e0e6f0;">
+                  </span>
+                  <span style="font-weight:800; color:#23272b;">{{ user.get_full_name|default:user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 mt-2" aria-labelledby="userDropdown" style="min-width:230px;">
+                  <li><a class="dropdown-item py-2" href="{% url 'bookings:list' %}"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
+                  <li><a class="dropdown-item py-2" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item py-2" href="{% url 'account_logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link px-4 py-2 rounded-pill nav-modern nav-underline" href="{% url 'account_login' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link px-4 py-2 rounded-pill nav-modern nav-underline" href="{% url 'account_signup' %}"><i class="fas fa-user-plus me-2"></i>Sign Up</a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <style>
+      .welcome-animated {
+        animation: welcomeFadeIn 1.1s cubic-bezier(.4,0,.2,1), welcomeBounce 1.2s 1.1s cubic-bezier(.4,0,.2,1);
+        box-shadow: 0 2px 12px #6dd5ed33, 0 0 8px #6dd5ed22;
+        background: linear-gradient(90deg, #fff 60%, #e0f7fa 100%);
+        position: relative;
+        z-index: 1;
+        border-radius: 1.2rem;
+        padding: 0.4rem 1.2rem;
+        /* Remove static border, use animated border below */
+      }
+
+      /* Simple border for welcome-animated */
+      .welcome-animated {
+        border: 2px solid #6dd5ed;
+      }
+      }
+      @keyframes welcomeFadeIn {
+        0% { opacity: 0; transform: scale(0.7) translateY(-20px); }
+        60% { opacity: 1; transform: scale(1.08) translateY(8px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+      }
+      @keyframes welcomeBounce {
+        0% { transform: scale(1) translateY(0); }
+        30% { transform: scale(1.08) translateY(-6px); }
+        60% { transform: scale(0.97) translateY(2px); }
+        100% { transform: scale(1) translateY(0); }
+      }
+      .nav-luxury-glass {
+        box-shadow: 0 12px 48px #6dd5ed44, 0 2px 0 #6dd5ed;
+        background: linear-gradient(90deg, #e0e6f0 0%, #f5f7fa 100%) !important;
+        backdrop-filter: blur(18px) saturate(1.4);
+        border-radius: 0 0 2.5rem 2.5rem;
+        border-bottom: 2.5px solid #6dd5ed;
+        margin-bottom: 0.5rem;
+      }
+      .logo-gradient-ring {
+        display: inline-block;
+        padding: 4px;
+        border-radius: 24px;
+        background: conic-gradient(from 180deg at 50% 50%, #6dd5ed, #3c50b4, #6dd5ed 80%);
+        box-shadow: 0 6px 24px #6dd5ed55, 0 0 16px #fff8;
+        animation: spin 7s linear infinite;
+        transition: box-shadow 0.2s, filter 0.2s;
+        filter: drop-shadow(0 0 8px #6dd5ed88);
+      }
+      @keyframes spin {
+        0% { filter: hue-rotate(0deg) drop-shadow(0 0 8px #6dd5ed88); }
+        100% { filter: hue-rotate(360deg) drop-shadow(0 0 8px #6dd5ed88); }
+      }
+      .nav-modern {
+        color: #23272b !important;
+        background: linear-gradient(90deg, #f5f7fa 0%, #e0e6f0 100%);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+        font-weight: 700;
+        box-shadow: 0 2px 8px #6dd5ed22;
+        border: 1.5px solid #e0e6f0;
+        position: relative;
+        overflow: hidden;
+      }
+      .nav-modern:hover, .nav-modern.active {
+        background: linear-gradient(90deg, #6dd5ed 0%, #3c50b4 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 4px 24px #6dd5ed55;
+        border: 1.5px solid #6dd5ed;
+      }
+      .nav-underline::after {
+        content: '';
+        display: block;
+        height: 3px;
+        width: 0;
+        background: linear-gradient(90deg, #6dd5ed 0%, #3c50b4 100%);
+        border-radius: 2px;
+        transition: width 0.3s cubic-bezier(.4,0,.2,1);
+        margin-top: 2px;
+      }
+      .nav-modern:hover.nav-underline::after, .nav-modern.active.nav-underline::after {
+        width: 100%;
+        box-shadow: 0 2px 8px #6dd5ed88;
+      }
+      .nav-modern::before {
+        content: '';
+        position: absolute;
+        left: -60%;
+        top: 0;
+        width: 220%;
+        height: 100%;
+        background: linear-gradient(120deg, #6dd5ed33 0%, #3c50b433 100%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      .nav-modern:hover::before, .nav-modern.active::before {
+        opacity: 1;
+        animation: shimmer 1.2s linear;
+      }
+      @keyframes shimmer {
+        0% { left: -60%; }
+        100% { left: 100%; }
+      }
+      .navbar-nav .dropdown-menu {
+        background: #fff;
+        border-radius: 1.2rem;
+        border: none;
+        box-shadow: 0 8px 32px #6dd5ed33;
+        backdrop-filter: blur(8px) saturate(1.1);
+        animation: fadeInDropdown 0.4s cubic-bezier(.4,0,.2,1);
+      }
+      @keyframes fadeInDropdown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .navbar-nav .dropdown-item {
+        color: #23272b;
+        font-weight: 500;
+        border-radius: 0.7rem;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      }
+      .navbar-nav .dropdown-item:hover {
+        background: linear-gradient(90deg, #e0f7fa 0%, #6dd5ed22 100%);
+        color: #3c50b4;
+        box-shadow: 0 2px 8px #6dd5ed33;
+      }
+      .avatar-gradient-ring {
+        display: inline-block;
+        padding: 4px;
+        border-radius: 50%;
+        background: conic-gradient(from 180deg at 50% 50%, #6dd5ed, #3c50b4, #6dd5ed 80%);
+        box-shadow: 0 2px 12px #6dd5ed55, 0 0 8px #fff8;
+        animation: spin 8s linear infinite;
+        transition: box-shadow 0.2s, filter 0.2s;
+        filter: drop-shadow(0 0 8px #6dd5ed88);
+      }
+      .nav-bell {
+        color: #3c50b4;
+        background: transparent;
+        transition: color 0.2s, transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        filter: drop-shadow(0 0 6px #6dd5ed33);
+      }
+      .nav-bell.active, .nav-bell:hover {
+        color: #6dd5ed;
+        transform: scale(1.18) rotate(-8deg);
+        box-shadow: 0 0 16px #6dd5ed88;
+        filter: drop-shadow(0 0 12px #6dd5ed88);
+      }
+    </style>
+    </style>
+
+    <!-- Toast Notifications -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2 show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+            {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container my-4 flex-grow-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Modern Dark Mode Footer -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <footer class="footer mt-auto pt-5 pb-3" style="background: #181c24; color: #e0e6f0; font-family: 'Inter', 'Poppins', sans-serif; border-top: 2px solid #23272b;">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-12 col-md-4 col-lg-3 mb-4 mb-md-0">
+            <div class="d-flex flex-column align-items-start">
+              <img src="{% static 'img/NasraLogo.jpg' %}" alt="Nasrah Amour Logo" class="mb-3" style="height: 54px; filter: none; border-radius: 12px; box-shadow: 0 4px 18px #23272b55;">
+    <!-- Empowered by CC Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 1.5rem; background: linear-gradient(135deg, #23272b 0%, #3c50b4 100%); color: #e0e6f0; box-shadow: 0 10px 40px #23272b99; border: none;">
+          <div class="modal-header border-0" style="background: linear-gradient(90deg, #3c50b4 0%, #23272b 100%); border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem;">
+            <h5 class="modal-title w-100 text-center fw-bold" id="contactModalLabel" style="font-size:1.6rem; letter-spacing:1px; color:#6dd5ed;">Empowered by CC</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          </div>
+          <div class="modal-body text-center" style="padding:2.2rem 2rem 1.5rem 2rem;">
+            <p style="font-size:1.08rem; color:#b0b8c9; margin-bottom:2rem;">For partnership, support, or any inquiries, contact Nasrah Amour's Group directly:</p>
+            <div class="d-flex flex-column gap-3 align-items-center justify-content-center" style="max-width:320px; margin:0 auto;">
+              <a href="tel:+255711311363" class="btn w-100" style="background: linear-gradient(90deg, #8bc34a 0%, #aed581 100%); color:#215732; font-weight:700; border-radius:2rem; font-size:1.1rem; box-shadow:0 8px 25px rgba(0,0,0,0.10);"><i class="fas fa-phone-alt me-2"></i>Mobile</a>
+              <a href="mailto:claytonecurth@gmail.com" class="btn w-100" style="background: linear-gradient(90deg, #9c27b0 0%, #ce93d8 100%); color:#fff; font-weight:700; border-radius:2rem; font-size:1.1rem; box-shadow:0 8px 25px rgba(0,0,0,0.10);"><i class="fas fa-envelope me-2"></i>Email</a>
+              <button type="button" class="btn w-100 mt-2" data-bs-dismiss="modal" style="background:#e0e6f0; color:#4a5670; border-radius:1.5rem; font-weight:600;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+              <h5 class="fw-bold mb-2" style="color:#fff; letter-spacing:1px;">Moshi Rental</h5>
+              <p style="max-width: 260px; color: #b0b8c9; font-size: 0.97rem;">Your one-stop solution for renting items in Moshi. Excellence & customer satisfaction, always.</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <h6 class="fw-bold mb-3" style="color:#6dd5ed;">Quick Links</h6>
+            <ul class="list-unstyled">
+              <li><a href="{% url 'rentals:home' %}" class="footer-link"><i class="fas fa-home me-2"></i>Home</a></li>
+              <li><a href="{% url 'rentals:item_list' %}" class="footer-link"><i class="fas fa-boxes me-2"></i>Browse Items</a></li>
+              {% if not user.is_authenticated %}
+                <li><a href="{% url 'account_login' %}" class="footer-link"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                <li><a href="{% url 'account_signup' %}" class="footer-link"><i class="fas fa-user-plus me-2"></i>Sign Up</a></li>
+              {% else %}
+                <li><a href="{% url 'bookings:list' %}" class="footer-link"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
+                <li><a href="#" class="footer-link"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="col-6 col-md-4 col-lg-3">
+            <h6 class="fw-bold mb-3" style="color:#6dd5ed;">Contact</h6>
+            <ul class="list-unstyled mb-2">
+              <li class="mb-2"><a href="mailto:info@moshirental.com" class="footer-link"><i class="fas fa-envelope me-2"></i>info@moshirental.com</a></li>
+              <li><a href="tel:+255711311363" class="footer-link"><i class="fas fa-phone me-2"></i>+255 711 311 363</a></li>
+            </ul>
+            <div class="d-flex gap-3 mt-3">
+              <a href="https://facebook.com" target="_blank" class="footer-social"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://twitter.com" target="_blank" class="footer-social"><i class="fab fa-twitter"></i></a>
+              <a href="https://instagram.com" target="_blank" class="footer-social"><i class="fab fa-instagram"></i></a>
+              <a href="https://linkedin.com" target="_blank" class="footer-social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+            <div class="p-4 rounded-4" style="background: linear-gradient(90deg, #23272b 0%, #3c50b4 100%); box-shadow: 0 4px 24px rgba(40,167,69,0.10);">
+              <h6 class="fw-bold mb-2" style="color:#6dd5ed;">Stay Updated</h6>
+              <p class="mb-2" style="color:#b0b8c9;">Subscribe for updates & offers.</p>
+              <form action="#" method="post" class="d-flex flex-row gap-2">{% csrf_token %}
+                <input type="email" class="form-control rounded-pill" placeholder="Your email address" required style="max-width: 180px;">
+                <button class="btn rounded-pill px-3" type="submit" style="background: #6dd5ed; color: #23272b; font-weight:600;">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12 text-center">
+            <hr style="border-color: #2a3a5e; opacity:0.2;">
+            <p class="mb-0" style="font-size:1rem; color:#b0b8c9;">
+              &copy; {% now "Y" %} Moshi Rental. All rights reserved.<br>
+              <span class="fw-bold" style="color:#fff;">Developed by Nasrah Amour's Group</span>
+              | Empowered by <a href="#" class="fw-bold text-info" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration:underline;">CC</a>
+              | <a href="#" class="footer-link" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+              | <a href="#" class="footer-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+    <!-- Privacy Policy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 1.5rem; background: linear-gradient(135deg, #23272b 0%, #3c50b4 100%); color: #e0e6f0; box-shadow: 0 10px 40px #23272b99; border: none;">
+          <div class="modal-header border-0" style="background: linear-gradient(90deg, #3c50b4 0%, #23272b 100%); border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem;">
+            <h5 class="modal-title w-100 text-center fw-bold" id="privacyModalLabel" style="font-size:1.5rem; color:#6dd5ed;"><i class="fas fa-user-shield me-2"></i>Privacy Policy</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          </div>
+          <div class="modal-body" style="padding:2.2rem 2rem 1.5rem 2rem;">
+            <section class="mb-4">
+              <p class="fst-italic text-info"><i class="fas fa-quote-left me-2"></i>Your privacy is our priority. We are committed to protecting your personal information and your right to privacy.</p>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-database me-2"></i>What We Collect</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>Name, email, and contact details when you register or book.</li>
+                <li>Booking and payment history for your rentals.</li>
+                <li>Device and usage data (for security and analytics).</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-lock me-2"></i>How We Use Your Data</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>To process bookings and payments securely.</li>
+                <li>To personalize your experience and improve our services.</li>
+                <li>To communicate important updates and offers.</li>
+                <li>We <span class="fw-bold text-success">never</span> sell your data to third parties.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-user-secret me-2"></i>Your Rights</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>Access, update, or delete your personal information anytime.</li>
+                <li>Request a copy of your data or ask questions via <a href="mailto:info@moshirental.com" class="text-info">info@moshirental.com</a>.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-shield-alt me-2"></i>Security</h6>
+              <p style="color:#b0b8c9;">We use modern security measures (SSL, encryption, access controls) to keep your data safe. <span class="fst-italic text-success">Your trust is our greatest asset.</span></p>
+            </section>
+            <section class="mb-2">
+              <p class="fst-italic text-warning"><i class="fas fa-info-circle me-2"></i>This policy may be updated. Please check regularly for changes.</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 1.5rem; background: linear-gradient(135deg, #23272b 0%, #3c50b4 100%); color: #e0e6f0; box-shadow: 0 10px 40px #23272b99; border: none;">
+          <div class="modal-header border-0" style="background: linear-gradient(90deg, #3c50b4 0%, #23272b 100%); border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem;">
+            <h5 class="modal-title w-100 text-center fw-bold" id="termsModalLabel" style="font-size:1.5rem; color:#6dd5ed;"><i class="fas fa-file-contract me-2"></i>Terms &amp; Conditions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          </div>
+          <div class="modal-body" style="padding:2.2rem 2rem 1.5rem 2rem;">
+            <section class="mb-4">
+              <p class="fst-italic text-info"><i class="fas fa-quote-left me-2"></i>By using Moshi Rental, you agree to these terms. Please read carefully.</p>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-user-check me-2"></i>Account &amp; Eligibility</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>You must be 18+ and provide accurate information.</li>
+                <li>Keep your account secure. You are responsible for all activity under your account.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-calendar-check me-2"></i>Bookings &amp; Payments</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>All bookings are subject to availability and confirmation.</li>
+                <li>Payments must be made in full before item collection or delivery.</li>
+                <li>Late returns may incur additional charges.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-box-open me-2"></i>Item Use &amp; Responsibility</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>Use items responsibly and return them in the condition received.</li>
+                <li>You are liable for loss or damage during your rental period.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-undo-alt me-2"></i>Cancellation &amp; Refunds</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>Cancellations must be made at least 24 hours before start date for a full refund.</li>
+                <li>No refunds for late cancellations or no-shows.</li>
+              </ul>
+            </section>
+            <section class="mb-3">
+              <h6 class="fw-bold text-info mb-2"><i class="fas fa-gavel me-2"></i>General</h6>
+              <ul style="list-style: disc inside; color:#b0b8c9;">
+                <li>We reserve the right to update these terms at any time.</li>
+                <li>For questions, contact <a href="mailto:info@moshirental.com" class="text-info">info@moshirental.com</a>.</li>
+              </ul>
+            </section>
+            <section class="mb-2">
+              <p class="fst-italic text-warning"><i class="fas fa-info-circle me-2"></i>By using this site, you accept these terms. Thank you for choosing Moshi Rental!</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+            </p>
+          </div>
+        </div>
+      </div>
+      <style>
+        .footer-link {
+          color: #b0b8c9;
+          text-decoration: none;
+          transition: color 0.2s, text-shadow 0.2s;
+        }
+        .footer-link:hover {
+          color: #6dd5ed;
+          text-shadow: 0 2px 8px #23272b44;
+        }
+        .footer-social {
+          color: #b0b8c9;
+          font-size: 1.3rem;
+          transition: color 0.2s, transform 0.2s;
+        }
+        .footer-social:hover {
+          color: #6dd5ed;
+          transform: translateY(-3px) scale(1.15);
+        }
+      </style>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
